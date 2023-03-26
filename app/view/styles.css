@@ -1,0 +1,129 @@
+#body {
+  background-color: #f2f5f8;
+  height: auto;
+}
+
+.main-header {
+  background-color: #2E3337;
+  -webkit-app-region: drag;
+  height: 57px;
+}
+
+.brand-image-custom {
+  margin-top: 0px;
+  margin-right: .2rem;
+  height: 33px;
+}
+
+.brand-link {
+}
+
+.content-wrapper {
+  padding-bottom:25px;
+}
+
+.wrapper-icons {
+  float: none;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: -10px;
+}
+
+.upload-btn, #create_bucket, #btn_login, #add_folder_submit, #share_submit {
+  background-color: #ec7211;
+}
+
+.upload-btn:hover {
+  background-color: #ec7211;
+}
+
+.dropdown-menu {
+  /*left: -5rem;*/
+  min-width: 5rem;
+}
+
+#search {
+  z-index: 0;
+}
+
+.right-top-nav-btn {
+  color: white;
+}
+
+.right-top-nav-btn:hover {
+  color: white;
+}
+
+.btn-normal {
+  color: #555b63;
+  border-color: #555b63;
+  margin-right:4px;
+}
+
+.table {
+  table-layout: fixed;
+}
+
+a {
+  color: #2e73b5;
+}
+
+#breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+  content: none;
+}
+
+.breadcrumb-chevron-right {
+  color: #acb7b8;
+}
+
+.expire-type-label {
+  margin-right: 15px;
+  margin-left: 3px;
+}
+
+#style_buttons {
+  margin-right: 40px;
+}
+
+#object_buttons {
+  margin-top: 10px;
+}
+
+.icons-ul {
+  margin: 20px;
+  padding-left: 0;
+  list-style: none;
+}
+
+.icons-ul>li {
+  float: left;
+  padding: 10px;
+  text-align: center;
+  width: 20%;
+}
+
+.icons-ul>li div{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.icons-ul>li div i{
+  height: auto;
+  font-size: 45px;
+  max-width: 100%;
+  margin-bottom: 10px;
+}
+
+.icons-ul>li img{
+  height: auto;
+  max-width: 80%;
+}
+
+.icons-ul>li div span{
+  color: #495057;
+  height: 40px;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

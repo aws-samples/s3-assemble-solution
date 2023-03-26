@@ -1,0 +1,62 @@
+{
+  "name": "s3-assemble-solution",
+  "productName": "S3 Assemble",
+  "description": "",
+  "keywords": [
+    "AWS",
+    "S3"
+  ],
+  "main": "./app/main.js",
+  "version": "1.0.0",
+  "author": "jiachal@amazon.com",
+  "scripts": {
+    "start": "electron .",
+    "dist-mac": "electron-builder",
+    "dist-win": "electron-builder --win --x64"
+  },
+  "build": {
+    "appId": "com.s3.assemble",
+    "copyright": "",
+    "productName": "s3-assemble",
+    "files": [
+      "!dist/**/*"
+    ],
+    "mac": {
+      "icon": "assets/images/512x512.png",
+      "category": "public.app-category.productivity",
+      "artifactName": "${productName}-v${version}.${ext}",
+      "target": [
+        "dmg"
+      ]
+    },
+    "asar": false,
+    "win": {
+      "icon": "assets/images/512x512.png",
+      "artifactName": "${productName}-v${version}.${ext}",
+      "target": [
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "createDesktopShortcut": "always",
+      "allowToChangeInstallationDirectory": true
+    },
+    "extends": null
+  },
+  "dependencies": {
+    "admin-lte": "^3.2.0",
+    "aws-sdk": "^2.1122.0",
+    "better-sqlite3": "^7.5.1",
+    "fs.promises": "^0.1.2",
+    "i18next": "^21.6.16",
+    "i18next-fs-backend": "^1.1.4",
+    "mime": "^3.0.0"
+  },
+  "devDependencies": {
+    "bootstrap": "^3.4.1",
+    "electron": "^13.6.9",
+    "electron-builder": "^23.0.2",
+    "electron-rebuild": "^3.2.7"
+  }
+}

@@ -1,0 +1,51 @@
+        <div class="row mb-2 align-items-center px-2">
+          <!--<div class="col-sm-6">
+            <h1 class="m-0 text-dark"> S3 Client Demo <small>1.0</small></h1>
+          </div>-->
+          <div class="mr-auto">
+            <ol class="breadcrumb float-sm-left" id="breadcrumb">
+              <!--<li class="breadcrumb-item"><a href="#">Amazon S3</a></li>-->
+            </ol>
+          </div><!-- /.col -->
+          <div class="ml-auto" id="bucket_buttons">
+              <a class="btn btn-default btn-normal" id="refresh_buckets" href="#">
+                <i class="fa fa-redo"></i></a>
+              <!--<a class="btn btn-default btn-normal font-weight-bold" id="delete_buckets" href="#">删除</a>
+              <a class="btn btn-default font-weight-bold text-white" id="create_bucket" href="#">创建存储桶</a>-->
+          </div>
+          <div class="ml-auto" id="object_buttons" style="display:none">
+              <!--<a class="btn btn-default btn-normal" href="#">
+                <i class="fas fa-chevron-left"></i></a>
+              <a class="btn btn-default btn-normal" href="#">
+                <i class="fas fa-chevron-right"></i></a>-->
+              <div class="btn-group btn-group-toggle" id="style_buttons" data-toggle="buttons">
+                <label class="objects-style btn bg-light focus active"><i class="fa fa-list"><input type="radio" name="objects_style" value="list" class="objects_style" /></i></label>
+                <label class="objects-style btn bg-light"><i class="fa fa-th-large"><input type="radio" name="objects_style" value="icons" class="objects_style" /></i></label>
+              </div>
+              <a class="btn btn-default btn-normal" id="refresh_objects" href="#">
+                <i class="fa fa-redo"></i></a>
+              <a class="btn btn-default btn-normal font-weight-bold" id="delete_objects_btn" data-i18n="objects.header.delete" href="#"></a>
+              <a class="btn btn-default btn-normal font-weight-bold" id="share_objects_btn" data-toggle="modal" data-target="#share_modal" data-i18n="objects.header.share" href="#"></a>
+              <a class="btn btn-default btn-normal font-weight-bold" id="download_objects_btn" data-i18n="objects.header.download" href="#"></a>
+              <div class="btn-group">
+                <button type="button" class="btn btn-default btn-normal font-weight-bold dropdown-toggle dropdown-hover dropdown-icon" data-toggle="dropdown">
+                  <span data-i18n="objects.header.action"></span>
+                  <!--<span class="sr-only">Toggle Dropdown</span>-->
+                  <div class="dropdown-menu" role="menu">
+                    <!--<a class="dropdown-item" id="rekognition_objects_btn" href="#">Rekognition</a>-->
+                    <a class="dropdown-item" id="make_public_btn" data-i18n="objects.header.makePublic" href="#"></a>
+                  </div>
+                </button>
+              </div>
+              <a class="btn btn-default btn-normal font-weight-bold" id="add_folder_btn" data-toggle="modal" data-target="#add_folder_modal" data-i18n="objects.header.createFolder" href="#"></a>
+              <div class="btn-group">
+                <button type="button" class="btn btn-default text-white dropdown-toggle dropdown-hover dropdown-icon upload-btn" data-toggle="dropdown">
+                  <span data-i18n="objects.header.upload"></span>
+                  <span class="sr-only">Toggle Dropdown</span>
+                  <div class="dropdown-menu" role="menu">
+                    <a class="dropdown-item" id="upload_objects_btn" data-i18n="objects.header.uploadObject" href="#"></a>
+                    <a class="dropdown-item" id="upload_folders_btn" data-i18n="objects.header.uploadFolder" href="#"></a>
+                  </div>
+                </button>
+              </div>
+          </div>

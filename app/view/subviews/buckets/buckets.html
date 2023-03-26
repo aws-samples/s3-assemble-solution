@@ -1,0 +1,39 @@
+<div class="col-12">
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title font-weight-bold" data-i18n="buckets.table.head"></h3>
+
+      <div class="card-tools">
+        <div class="input-group input-group-sm" style="width: 250px;">
+          <input type="text" name="table_search" class="form-control float-right" placeholder="">
+
+          <div class="input-group-append">
+            <button type="submit" id="search" class="btn btn-default">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body table-responsive p-0">
+      <table class="table text-wrap">
+        <thead>
+          <tr>
+            <!--<th><input type="checkbox" /></th>-->
+            <th width="43%" data-i18n="buckets.table.name"></th>
+            <th width="20%" data-i18n="buckets.table.region"></th>
+            <th width="18%" data-i18n="buckets.table.access"></th>
+            <th width="18%" data-i18n="buckets.table.creationDate"></th>
+          </tr>
+        </thead>
+        <tbody id="buckets_list">
+        </tbody>
+      </table>
+      <div id="loading">
+      </div>
+    </div>
+    <!-- /.card-body -->
+  </div>
+  <!-- /.card -->
+</div>

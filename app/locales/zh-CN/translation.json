@@ -1,0 +1,133 @@
+{
+  "wrapper" :{
+    "uploadRecords": "上传记录",
+    "clearCache": "清除缓存",
+    "help": "帮助",
+    "logout": "登出"
+  },
+  "credential": {
+    "header": "证书信息",
+    "MainlandChina": "中国大陆区域",
+    "others": "全球区域",
+    "login": "登录"
+  },
+  "buckets" : {
+    "region": {
+      "cn-northwest-1": "中国(宁夏)",
+      "cn-north-1": "中国(北京)",
+      "us-east-1": "美国东部(弗吉尼亚北部)",
+      "us-east-2": "美国东部(俄亥俄州)",
+      "us-west-1": "美国西部(加利福尼亚北部)",
+      "us-west-2": "美国西部(俄勒冈州)",
+      "af-south-1": "非洲(开普敦)",
+      "ap-east-1": "亚太地区(香港)",
+      "ap-southeast-3": "亚太地区(雅加达)",
+      "ap-south-1": "亚太地区(孟买)",
+      "ap-northeast-3": "亚太地区(大阪)",
+      "ap-northeast-2": "亚太地区(首尔)",
+      "ap-southeast-1": "亚太地区(新加坡)",
+      "ap-southeast-2": "亚太地区(悉尼)",
+      "ap-northeast-1": "亚太地区(东京)",
+      "ca-central-1": "加拿大(中部)",
+      "eu-central-1": "欧洲(法兰克福)",
+      "eu-west-1": "欧洲(爱尔兰)",
+      "eu-west-2": "欧洲(伦敦)",
+      "eu-south-1": "欧洲(米兰)",
+      "eu-west-3": "欧洲(巴黎)",
+      "eu-north-1": "欧洲(斯德哥尔摩)",
+      "me-south-1": "中东(巴林)",
+      "sa-east-1": "南美洲(圣保罗)"
+    },
+    "access": {
+      "objectsCanBePublic": "对象可以是公有的",
+      "bucketAndObjectsNotPublic": "存储桶和对象不是公有的"
+    },
+    "table": {
+      "head": "存储桶",
+      "search": "输入关键词搜索",
+      "name": "名称",
+      "region": "区域",
+      "access": "访问",
+      "creationDate": "创建日期"
+    }
+  },
+  "objects" : {
+    "header": {
+      "delete": "删除",
+      "share": "分享",
+      "download": "下载",
+      "action": "操作",
+      "makePublic": "设为公开",
+      "createFolder": "创建文件夹",
+      "upload": "上传",
+      "uploadObject": "上传文件",
+      "uploadFolder": "上传文件夹"
+    },
+    "storageClass": {
+      "STANDARD": "标准",
+      "REDUCED_REDUNDANCY": "低冗余",
+      "STANDARD_IA": "标准-IA",
+      "ONEZONE_IA": "One Zone-IA",
+      "INTELLIGENT_TIERING": "智能分层",
+      "GLACIER": "Glacier",
+      "DEEP_ARCHIVE": "Glacier Deep Archive",
+      "OUTPOSTS": "Outposts",
+      "GLACIER_IR": "Glacier即时检索"
+    },
+    "table": {
+      "head": "对象",
+      "search": "输入前缀关键词搜索",
+      "name": "名称",
+      "type": "类型",
+      "lastModified": "上次修改时间",
+      "size": "大小",
+      "storageClass": "存储类",
+      "folder": "文件夹",
+      "object": "文件"
+    }
+  },
+  "toast": {
+    "deletedSuccessfully": "删除成功",
+    "canNotShareFolder": "目录还不支持分享",
+    "copiedToClipboard": "分享地址已复制到剪切板",
+    "yourDownloadHasStarted": "开始下载",
+    "yourDownloadHasCompleted": "下载完成",
+    "makePublicSuccessfully": "设为公开成功",
+    "yourUploadHasStarted": "开始上传",
+    "yourUploadHasCompleted": "上传完成"
+  },
+  "modal": {
+    "uploadRecords": "上传记录",
+    "createFolder": "创建文件夹",
+    "folderName": "文件夹名称",
+    "create": "创建",
+    "cancel": "取消",
+    "generateShareLink": "生成分享链接",
+    "linkValidityPeriod": "链接有效期",
+    "day": "天",
+    "hour": "小时",
+    "minute": "分钟",
+    "generate": "生成",
+    "fileName": "文件名",
+    "uploadStatus": "上传进度",
+    "label": "标签",
+    "action": "操作"
+  },
+  "help": {
+    "faq": "常见问题",
+    "q1": "1. 登录页面的 Access Key ID 和 Secret Access Key 是什么？如何获取？",
+    "a1": "Access Key是您的访问密钥，请您联系管理员获取，如您拥有管理员权限，请参考<a href='https://docs.aws.amazon.com/zh_cn/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys' target='_blank'>文档</a>创建。",
+    "q2": "2. Access Key ID 和 Secret Access Key 在使用过程中安全吗？",
+    "a2": "Access Key ID 和 Secret Access Key仅会存储在本地的数据库，关于更多关于密钥的安全问题，请参考<a href='https://docs.aws.amazon.com/zh_cn/general/latest/gr/aws-access-keys-best-practices.html' target='_blank'>文档</a>。",
+    "q3": "3. 正常使用都需要哪些权限？",
+    "a3": "如想无障碍使用需要托管的 AmazonS3FullAccess 权限组，也可以通过策略限制只访问特定存储桶，具体可以参考文档 <a href='https://docs.aws.amazon.com/zh_cn/IAM/latest/UserGuide/access_policies.html' target='_blank'>IAM策略</a>。"
+  },
+  "error": {
+    "InvalidAccessKeyId": "无效的Access Key ID",
+    "SignatureDoesNotMatch": "签名不匹配，请确认登录信息的正确性",
+    "InvalidExpiryTime": "链接有效期不能超过7天"
+  },
+  "save": "保存",
+  "logout": "登出",
+  "loading": "加载中..."
+}
