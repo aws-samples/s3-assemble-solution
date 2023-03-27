@@ -55,8 +55,8 @@
   },
   "devDependencies": {
     "bootstrap": "^3.4.1",
-    "electron": "^13.6.9",
-    "electron-builder": "^23.0.2",
+    "electron": "^23.2.0",
+    "electron-builder": "^23.6.0",
     "electron-rebuild": "^3.2.7"
   }
 }
