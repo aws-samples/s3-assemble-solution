@@ -61,20 +61,6 @@ function loadWrapper() {
         ipcRenderer.on('get-upload-list-response', (event, data) => {
           let message = `
             <div class="">
-              <!--<div class="card-header">
-                <h3 class="card-title">Simple Full Width Table</h3>
-
-                <div class="card-tools">
-                  <ul class="pagination pagination-sm float-right">
-                    <li class="page-item"><a class="page-link" href="#">«</a></li>
-                    <li class="page-item"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item"><a class="page-link" href="#">»</a></li>
-                  </ul>
-                </div>
-              </div>-->
-              <!-- /.card-header -->
               <div class="card-body table-responsive p-0">
                 <table class="table text-wrap">
                   <thead>
@@ -107,7 +93,6 @@ function loadWrapper() {
                   </tbody>
                 </table>
               </div>
-              <!-- /.card-body -->
             </div>
           `
           $("#upload_list_body").html(message)
@@ -124,10 +109,10 @@ function loadWrapper() {
         })
     })
 
-    ipcRenderer.send('check-credentials-exist-send')
-    ipcRenderer.once('check-credentials-exist-response', (event, isExist) => {
+    ipcRenderer.send('check-active-send')
+    ipcRenderer.once('check-active-response', (event, isActive) => {
 
-      if (isExist) {
+      if (isActive) {
         globalBuckets.init()
         tool.localize()
       } else {

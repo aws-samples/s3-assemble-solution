@@ -1,8 +1,11 @@
 const {app, ipcMain} = require('electron')
 const {DataCache} = require('../service/data-cache')
+const {BucketsModel} = require('../model/buckets')
+const {CredentialsModel} = require('../model/credentials')
+const {CredentialBucketModel} = require('../model/credential-bucket')
+const {UploadsModel} = require('../model/uploads')
 const {STS} = require('./sts')
 const AWS = require('aws-sdk')
-const db = require('better-sqlite3')(app.getPath('userData') + '/default.db')
 const tool = require('../service/tool')
 const i18n = require('../service/i18n')
 
@@ -16,58 +19,62 @@ class S3 {
 
     this.identityCache = new DataCache(new STS().getIdentity)
 
+    this.bucketsModel = new BucketsModel()
+
+    this.credentialsModel = new CredentialsModel()
+
+    this.credentialBucketModel = new CredentialBucketModel()
+
+    this.uploadsModel = new UploadsModel()
+
     this.allKeys = []
 
-    // init the database
-    db.prepare(`CREATE TABLE IF NOT EXISTS uploads (id INTEGER NOT NULL PRIMARY KEY, file_name TEXT NOT NULL, progress INTEGER NOT NULL, create_time TEXT, update_time TEXT)`).run()
-    db.prepare(`CREATE TABLE IF NOT EXISTS buckets (id INTEGER NOT NULL PRIMARY KEY, bucket_name TEXT NOT NULL, region TEXT NOT NULL)`).run()
-    db.prepare(`CREATE TABLE IF NOT EXISTS objects (id INTEGER NOT NULL PRIMARY KEY, bucket_id INTEGER NOT NULL, object_key TEXT NOT NULL)`).run()
-
     ipcMain.on('fetch-buckets-send', (event) => {
-      console.log(`fetch-buckets-send is called`)
+      //console.log(`fetch-buckets-send is called`)
 
       this.fetchBuckets().then((result) => {
+        const credential = this.credentialsModel.getActiveCredential()
         let finalBuckets = []
         let counter = 0 
-        if (false) {
-          event.sender.send('fetch-buckets-response', result)
-        } else {
-          let buckets = result.Buckets
-          buckets.forEach((bucket, index, buckets) => {
-            let ret = this.headBucket(bucket.Name).then((ret) => {
+        let buckets = result.Buckets
+        console.log("ready to filter buckets")
+        buckets.forEach((bucket, index, buckets) => {
+          const bucketId = this.bucketsModel.createBucketIfNotExist(bucket.Name, credential.region_type)
+          let ret = this.headBucket(bucketId, bucket.Name).then((ret) => {
+            finalBuckets.push(bucket)
+            counter++
+            if (counter == buckets.length) {
+              finalBuckets = finalBuckets.sort(function(s, t) {
+                let a = s.Name.toLowerCase()
+                let b = t.Name.toLowerCase()
+                if (a < b) return -1
+                if (a > b) return 1
+                return 0
+              })
+              result.Buckets = finalBuckets
+              event.sender.send('fetch-buckets-response', result)
+            }
+          }).catch((error) => {
+            //console.log("error ", error)
+            //console.log("statusCode ", error.statusCode)
+            const errorCodes = [400, 403, 404]
+            if (!errorCodes.includes(error.statusCode)) {
               finalBuckets.push(bucket)
-              counter++
-              if (counter == buckets.length) {
-                finalBuckets = finalBuckets.sort(function(s, t) {
-                  let a = s.Name.toLowerCase()
-                  let b = t.Name.toLowerCase()
-                  if (a < b) return -1
-                  if (a > b) return 1
-                  return 0
-                })
-                result.Buckets = finalBuckets
-                event.sender.send('fetch-buckets-response', result)
-              }
-            }).catch((error) => {
-              console.log(error.statusCode)
-              if (error.statusCode != 403) {
-                finalBuckets.push(bucket)
-              }
-              counter++
-              if (counter == buckets.length) {
-                finalBuckets = finalBuckets.sort(function(s, t) {
-                  let a = s.Name.toLowerCase()
-                  let b = t.Name.toLowerCase()
-                  if (a < b) return -1
-                  if (a > b) return 1
-                  return 0
-                })
-                result.Buckets = finalBuckets
-                event.sender.send('fetch-buckets-response', result)
-              }
-            })
+            }
+            counter++
+            if (counter == buckets.length) {
+              finalBuckets = finalBuckets.sort(function(s, t) {
+                let a = s.Name.toLowerCase()
+                let b = t.Name.toLowerCase()
+                if (a < b) return -1
+                if (a > b) return 1
+                return 0
+              })
+              result.Buckets = finalBuckets
+              event.sender.send('fetch-buckets-response', result)
+            }
           })
-        }
+        })
       }).catch((error) => {
         event.sender.send('error-alert', i18n.t("error." + error.code))
       })
@@ -83,7 +90,7 @@ class S3 {
     })
 
     ipcMain.on('get-bucket-public-access-block-send', (event, bucketName) => {
-      console.log(`get-bucket-public-access-block-send is called and bucketName=${bucketName}`)
+      //console.log(`get-bucket-public-access-block-send is called and bucketName=${bucketName}`)
       this.getBucketPublicAccessBlock(bucketName).then((result) => {
         let ret = ''
         let confSet = result.PublicAccessBlockConfiguration
@@ -94,6 +101,7 @@ class S3 {
         }
         event.sender.send('get-bucket-public-access-block-' + bucketName + '-response', ret)
       }).catch((error) => {
+        console.log('getBucketPublicAccessBlock result error', error)
         this.getAccountPublicAccessBlock().then((result) => {
             let ret = ''
             let confSet = result.PublicAccessBlockConfiguration
@@ -104,49 +112,28 @@ class S3 {
             }
             event.sender.send('get-bucket-public-access-block-' + bucketName + '-response', ret)
         }).catch((error) => {
-            console.log(`error `, error)
-            event.sender.send('error-alert', i18n.t("error." + error.code))
+            console.log('getAccountPublicAccessBlock result error', error)
+            ret = i18n.t("buckets.access.bucketAndObjectsNotPublic")
+            event.sender.send('get-bucket-public-access-block-' + bucketName + '-response', ret)
         })
       })
     })
 
     ipcMain.on('fetch-bucket-objects-send', (event, bucketName, prefix, keyword, style) => {
       console.log(`fetch-bucket-objects-send is called and bucketName=${bucketName} prefix=${prefix} keyword=${keyword}`)
-      if (keyword && style == 'icons') {
-        let scope = this.getBucketObjectsByLabel(bucketName, prefix, keyword)
-        let bucketParams = {
-          Bucket : bucketName,
-          Prefix : prefix,
-          Delimiter : '/'
-        }
-        this.getBucketObjects(bucketParams).then((result) => {
-          let tmpContents = []
-          result.Contents.forEach(object => {
-            if (scope.includes(object.Key)) {
-              tmpContents.push(object)
-            }
-          })
-          result.Contents = tmpContents
-          result.CommonPrefixes = []
-          event.sender.send('fetch-bucket-objects-response', result, prefix)
-        }).catch((error) => {
-          event.sender.send('error-alert', i18n.t("error." + error.code))
-        })
-      } else {
-        if (keyword) {
-          prefix += keyword
-        }
-        let bucketParams = {
-          Bucket : bucketName,
-          Prefix : prefix,
-          Delimiter : '/'
-        }
-        this.getBucketObjects(bucketParams).then((result) => {
-          event.sender.send('fetch-bucket-objects-response', result, prefix)
-        }).catch((error) => {
-          event.sender.send('error-alert', i18n.t("error." + error.code))
-        })
+      if (keyword) {
+        prefix += keyword
       }
+      let bucketParams = {
+        Bucket : bucketName,
+        Prefix : prefix,
+        Delimiter : '/'
+      }
+      this.getBucketObjects(bucketParams).then((result) => {
+        event.sender.send('fetch-bucket-objects-response', result, prefix)
+      }).catch((error) => {
+        event.sender.send('error-alert', i18n.t("error." + error.code))
+      })
     })
 
     ipcMain.on('on-drag-start', (event, bucketName, keyValue) => {
@@ -393,43 +380,37 @@ class S3 {
   }
 
   getS3Client(bucketName="") {
-    //console.log(`getS3Client is called and bucketName=${bucketName}`)
-    let endpoint = ""
+    const credential = this.credentialsModel.getActiveCredential()
     let params = {
       apiVersion: '2006-03-01',
       signatureVersion: 'v4',
-      useDualstack: true
+      useDualstack: true,
+      accessKeyId: credential.access_key_id,
+      secretAccessKey: credential.secret_access_key
     }
-    const credential = db.prepare("SELECT * FROM credential").get()
-    if (credential !== undefined && 'access_key_id' in credential && 'secret_access_key' in credential) {
-      params.accessKeyId = credential.access_key_id
-      params.secretAccessKey = credential.secret_access_key
-    }
-    const record = db.prepare("SELECT * FROM buckets WHERE bucket_name = ?").get(bucketName)
-    if (credential !== undefined && credential.region == 'MainlandChina') {
-      params.region = record ? record.region : 'cn-north-1'
+    const bucket = this.bucketsModel.getBucketByNameAndRegionType(bucketName, credential.region_type)
+    if (credential.region_type == 'MainlandChina') {
+      params.region = bucket ? bucket.region : 'cn-north-1'
     } else {
-      params.region = record ? record.region : 'ap-southeast-1'
+      params.region = bucket ? bucket.region : 'us-east-1'
     }
     let s3 = new AWS.S3(params)
     return s3
   }
 
   getS3ControlClient() {
+    const credential = this.credentialsModel.getActiveCredential()
     let params = {
       apiVersion: '2018-08-20',
       signatureVersion: 'v4',
-      useDualstack: true
+      useDualstack: true,
+      accessKeyId: credential.access_key_id,
+      secretAccessKey: credential.secret_access_key
     }
-    const credential = db.prepare("SELECT * FROM credential").get()
-    if (credential !== undefined && 'access_key_id' in credential && 'secret_access_key' in credential) {
-      params.accessKeyId = credential.access_key_id
-      params.secretAccessKey = credential.secret_access_key
-    }
-    if (credential !== undefined && credential.region == 'MainlandChina') {
-      params.region = 'cn-northwest-1'
+    if (credential.region_type == 'MainlandChina') {
+      params.region = 'cn-north-1'
     } else {
-      params.region = 'ap-southeast-1'
+      params.region = 'us-east-1'
     }
     let s3Control = new AWS.S3Control(params)
     return s3Control
@@ -451,8 +432,8 @@ class S3 {
     return promise
   }
 
-  headBucket(bucketName, owner='') {
-    console.log(`headBucket is called`)
+  headBucket(bucketId, bucketName, owner='') {
+    //console.log(`headBucket is called`)
     let s3 = this.getS3Client(bucketName)
     let params = {
       Bucket: bucketName
@@ -461,27 +442,71 @@ class S3 {
       params.ExpectedBucketOwner = owner
     }
     let promise = new Promise((resolve, reject) => {
-      s3.headBucket(params, function(err, data) {
-        if (err) {
-          reject(err)
+      const credential = this.credentialsModel.getActiveCredential()
+      let record = this.credentialBucketModel.getIsAuthorized(credential.id, bucketId)
+      if (record) {
+        if (record['is_authorized']) {
+          resolve()
         } else {
-          resolve(data)
+          reject({'statusCode': 403})
         }
-      })
+        console.log("hit cache !!!!!!")
+        // Asynchronously refreshing Bucket permissions
+        this.buildCredentialBucketCache(bucketId, bucketName, credential.region_type)
+      } else {
+        s3.headBucket(params, function(err, data) {
+          let isAuthorized = 0;
+          if (err) {
+            const errorCodes = [400, 403, 404]
+            if (!errorCodes.includes(err.statusCode)) {
+              isAuthorized = 1;
+            }
+            reject(err)
+          } else {
+            isAuthorized = 1;
+            resolve(data)
+          }
+          this.credentialBucketModel.createOrUpdateRecord(credential.id, bucketId, isAuthorized)
+        }.bind(this))
+      }
     })
     return promise
   }
 
+  async buildCredentialBucketCache(bucketId, bucketName, regionType) {
+    let s3 = this.getS3Client(bucketName)
+    let params = {
+      Bucket: bucketName
+    }
+    s3.headBucket(params, function(err, data) {
+      let isAuthorized = 0;
+      if (err) {
+        const errorCodes = [400, 403, 404]
+        if (!errorCodes.includes(err.statusCode)) {
+          isAuthorized = 1;
+        }
+      } else {
+        isAuthorized = 1;
+      }
+
+      const credential = this.credentialsModel.getActiveCredential()
+      this.credentialBucketModel.createOrUpdateRecord(credential.id, bucketId, isAuthorized)
+
+    }.bind(this))
+  }
+
   getBucketRegion(bucketName) {
-    console.log(`getBucketRegion is called and bucketName=${bucketName}`)
+    //console.log(`getBucketRegion is called and bucketName=${bucketName}`)
     let s3 = this.getS3Client()
+    const credential = this.credentialsModel.getActiveCredential()
     let promise = new Promise((resolve, reject) => {
-      const record = db.prepare("SELECT * FROM buckets WHERE bucket_name = ?").get(bucketName)
-      if (record && record.region) {
-        var data = {"LocationConstraint": record.region}
+      const bucket = this.bucketsModel.getBucketByNameAndRegionType(bucketName, credential.region_type)
+      if (bucket && bucket.region) {
+        let data = {"LocationConstraint": bucket.region}
+        //console.log("hit region cache!!!")
         resolve(data)
       } else {
-        var params = {
+        let params = {
           Bucket: bucketName
         }
         s3.getBucketLocation(params, function(err, data) {
@@ -489,21 +514,21 @@ class S3 {
             reject(err)
           } else {
             if (data) {
-              if (data.LocationConstraint == '') {
+              if (!data.LocationConstraint) {
                 data.LocationConstraint = 'us-east-1'
               }
-              db.prepare("INSERT INTO buckets (bucket_name, region) VALUES (?, ?)").run(bucketName, data.LocationConstraint)
+              this.bucketsModel.updateBucketByNameAndRegionType(bucketName, credential.region_type, {'region': data.LocationConstraint})
             }
             resolve(data)
           }
-        })
+        }.bind(this))
       }
     })
     return promise
   }
 
   getBucketPublicAccessBlock(bucketName) {
-    console.log(`getBucketPublicAccessBlock is called and bucketName=${bucketName}`)
+    //console.log(`getBucketPublicAccessBlock is called and bucketName=${bucketName}`)
     let s3 = this.getS3Client(bucketName)
     let promise = new Promise((resolve, reject) => {
       var params = {
@@ -531,6 +556,7 @@ class S3 {
         s3Control.getPublicAccessBlock(params, function(err, data) {
           if (err) {
             reject(err)
+            console.log(err)
           } else {
             resolve(data)
           }
@@ -593,7 +619,12 @@ class S3 {
       if (filePath.indexOf('/') != -1 || filePath.indexOf('\\') != -1) {
 
         // write the record to sqlite
-        const info = db.prepare("INSERT INTO uploads (file_name, progress, create_time) VALUES (?, ?, ?)").run(path.basename(filePath), 0, new Date().toISOString().replace('T', ' ').substr(0, 19))
+        let data = {
+          file_name: path.basename(filePath),
+          progress: 0,
+          create_time: new Date().toISOString().replace('T', ' ').substr(0, 19)
+        }
+        const info = this.uploadsModel.createUpload(data)
         recordId = info.lastInsertRowid
 
         fileStream = fs.createReadStream(filePath)
@@ -620,7 +651,7 @@ class S3 {
           console.log(`The progressPercentage is ${progressPercentage}`);
 
           //update the db and response to view
-          db.prepare("UPDATE uploads SET progress = ? WHERE id = ?").run(progressPercentage, recordId)
+          this.uploadsModel.updateUploadById(recordId, {progress: progressPercentage})
 
           const window = require('electron').BrowserWindow
           let focusedWindow = window.getAllWindows()[0]
@@ -711,29 +742,17 @@ class S3 {
   }
 
   getUploadList() {
-    console.log(`getUploadList is called`)
+    //console.log(`getUploadList is called`)
     let promise = new Promise((resolve, reject) => {
-      const rows = db.prepare("SELECT * FROM uploads ORDER BY id DESC").all()
+      const rows = this.uploadsModel.getUploads()
       resolve(rows)
     })
     return promise
   }
 
   deleteUploadRecord(record_id) {
-    console.log(`deleteUploadRecord is called`)
-    const rows = db.prepare("DELETE FROM uploads WHERE id = ?").run(record_id)
-  }
-
-  getBucketObjectsByLabel(bucketName, prefix, keyword) {
-    const labels = db.prepare("SELECT * FROM labels").all()
-    //console.log(`--------labels--------`)
-    //console.log(labels)
-    const records = db.prepare("SELECT * FROM objects CROSS JOIN buckets ON objects.bucket_id = buckets.id CROSS JOIN labels ON objects.id = labels.object_id WHERE buckets.bucket_name = ? AND objects.object_key LIKE (? || '%') AND labels.label = ?").all(bucketName, prefix, keyword.toLowerCase())
-    let scope = []
-    records.forEach(object => {
-      scope.push(object.object_key)
-    })
-    return scope
+    //console.log(`deleteUploadRecord is called`)
+    const rows = this.uploadsModel.deleteUploadById(record_id)
   }
 
   async listAllKeys(params){

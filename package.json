@@ -11,20 +11,20 @@
   "author": "jiachal@amazon.com",
   "scripts": {
     "start": "electron .",
-    "dist-mac": "electron-builder",
+    "dist-mac": "electron-builder --mac",
     "dist-win": "electron-builder --win --x64"
   },
   "build": {
     "appId": "com.s3.assemble",
     "copyright": "",
-    "productName": "s3-assemble",
+    "productName": "S3 Assemble",
     "files": [
       "!dist/**/*"
     ],
     "mac": {
       "icon": "assets/images/512x512.png",
       "category": "public.app-category.productivity",
-      "artifactName": "${productName}-v${version}.${ext}",
+      "artifactName": "s3-assemble-v${version}.${ext}",
       "target": [
         "dmg"
       ]
@@ -32,7 +32,7 @@
     "asar": false,
     "win": {
       "icon": "assets/images/512x512.png",
-      "artifactName": "${productName}-v${version}.${ext}",
+      "artifactName": "s3-assemble-v${version}.${ext}",
       "target": [
         "nsis"
       ]
@@ -47,11 +47,12 @@
   "dependencies": {
     "admin-lte": "^3.2.0",
     "aws-sdk": "^2.1363.0",
-    "better-sqlite3": "^7.5.1",
+    "better-sqlite3": "^8.3.0",
     "fs.promises": "^0.1.2",
     "i18next": "^21.6.16",
     "i18next-fs-backend": "^1.1.4",
-    "mime": "^3.0.0"
+    "mime": "^3.0.0",
+    "node-abi": "^3.40.0"
   },
   "devDependencies": {
     "bootstrap": "^3.4.1",

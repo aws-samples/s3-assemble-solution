@@ -16,7 +16,7 @@ class DataCache {
 
   getData() {
     if (!this.cache || this.isCacheExpired()) {
-      console.log('expired - fetching new data');
+      //console.log('expired - fetching new data');
       return this.fetchFunction()
         .then((data) => {
         this.cache = data;
@@ -24,7 +24,6 @@ class DataCache {
         return data;
       });
     } else {
-      console.log('cache hit');
       return Promise.resolve(this.cache);
     }
   }

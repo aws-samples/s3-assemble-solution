@@ -1,9 +1,51 @@
 // Modules to control application life and create native browser window
 const {app, BrowserWindow} = require('electron')
-const path = require('path')
 const {ipcMain} = require('electron')
 const {Credential} = require('./controller/credential')
 const {S3} = require('./controller/s3')
+const {InitModel} = require('./model/init')
+const path = require('path')
+const fs = require('fs')
+
+function initDatabases() {
+
+  const initModl = new InitModel()
+
+  // If it is the first time to open the application after installation and the version is inconsistent, then delete the old database to rebuild it.
+  // Get the user data directory
+  const userDataPath = app.getPath('userData')
+  // Get the version number of the current application
+  const appVersion = app.getVersion()
+  // Read the version number saved in the user data directory
+  const versionFilePath = path.join(userDataPath, 'version.txt')
+  let savedVersion = null
+  try {
+    savedVersion = fs.readFileSync(versionFilePath, 'utf-8')
+  } catch (err) {
+    console.error(err);
+  }
+
+  // If the version number is inconsistent, it means that the application is launched for the first time
+  if (savedVersion !== appVersion) {
+    console.log('This is the first time the application is launched.')
+
+    // Get old database path
+    const filePathToDelete = path.join(userDataPath, 'default.db')
+
+    // Delete the old database to rebuild it
+    try {
+      fs.unlinkSync(filePathToDelete);
+      initModl.init()
+    } catch (err) {
+      console.error(err)
+    }
+
+    // Update the version number saved in the user data directory
+    fs.writeFileSync(versionFilePath, appVersion, 'utf-8')
+  } else {
+    console.log('The application is already launched before.')
+  }
+}
 
 function initServices () {
   credential = new Credential()
@@ -12,9 +54,9 @@ function initServices () {
 
 function createWindow () {
 
-  const nativeImage = require('electron').nativeImage;
-  var image = nativeImage.createFromPath(__dirname + '/assets/images/512x512.png'); 
-  image.setTemplateImage(true);
+  const nativeImage = require('electron').nativeImage
+  var image = nativeImage.createFromPath(__dirname + '/assets/images/512x512.png')
+  image.setTemplateImage(true)
 
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -44,6 +86,7 @@ function createWindow () {
 // app.whenReady().then(createWindow)
 
 app.on('ready', function() {
+  initDatabases()
   initServices()
   createWindow()
 })
