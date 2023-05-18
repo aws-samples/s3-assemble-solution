@@ -7,7 +7,7 @@
     "S3"
   ],
   "main": "./app/main.js",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "jiachal@amazon.com",
   "scripts": {
     "start": "electron .",
@@ -56,7 +56,7 @@
   },
   "devDependencies": {
     "bootstrap": "^3.4.1",
-    "electron": "^24.1.2",
+    "electron": "^13.6.9",
     "electron-builder": "^24.1.1",
     "electron-rebuild": "^3.2.7"
   }
