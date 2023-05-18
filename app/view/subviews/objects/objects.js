@@ -148,11 +148,11 @@ function listBucketObjects(event) {
         <thead>
           <tr>
             <th width="5%"></th>
-            <th width="50%" data-i18n="objects.table.name"></th>
+            <th width="47%" data-i18n="objects.table.name"></th>
             <th width="10%" data-i18n="objects.table.type"></th>
             <th width="15%" data-i18n="objects.table.lastModified"></th>
             <th width="10%" data-i18n="objects.table.size"></th>
-            <th width="10%" data-i18n="objects.table.storageClass"></th>
+            <th width="13%" data-i18n="objects.table.storageClass"></th>
           </tr>
         </thead>
         <tbody id="objects_list">
@@ -428,16 +428,6 @@ function listBucketObjects(event) {
         icon: 'success',
         title: '[' + fileName + '] ' + i18n.t("toast.makePublicSuccessfully")
       })
-    })
-
-    // Bind rekognition event and listeners
-    $("#rekognition_objects_btn").off("click").on("click", function() {
-      let objects = []
-      $("input[name='object']:checked").each(function() {
-        parent2 = $(this).parent().parent()
-        objects.push({Key: parent2.attr("key_value"), Name: parent2.attr("object_name")})
-      })
-      ipcRenderer.send('rekognition-bucket-objects-send', bucketName, objects)
     })
 
     // Bind add folder event

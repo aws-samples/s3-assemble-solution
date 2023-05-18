@@ -22,7 +22,9 @@
       "af-south-1": "非洲(开普敦)",
       "ap-east-1": "亚太地区(香港)",
       "ap-southeast-3": "亚太地区(雅加达)",
+      "ap-southeast-4": "亚太地区(墨尔本)",
       "ap-south-1": "亚太地区(孟买)",
+      "ap-south-2": "亚太地区(海得拉巴)",
       "ap-northeast-3": "亚太地区(大阪)",
       "ap-northeast-2": "亚太地区(首尔)",
       "ap-southeast-1": "亚太地区(新加坡)",
@@ -30,12 +32,15 @@
       "ap-northeast-1": "亚太地区(东京)",
       "ca-central-1": "加拿大(中部)",
       "eu-central-1": "欧洲(法兰克福)",
+      "eu-central-2": "欧洲(苏黎世)",
       "eu-west-1": "欧洲(爱尔兰)",
       "eu-west-2": "欧洲(伦敦)",
-      "eu-south-1": "欧洲(米兰)",
       "eu-west-3": "欧洲(巴黎)",
+      "eu-south-1": "欧洲(米兰)",
+      "eu-south-2": "欧洲(西班牙)",
       "eu-north-1": "欧洲(斯德哥尔摩)",
       "me-south-1": "中东(巴林)",
+      "me-central-1": "中东(阿联酋)",
       "sa-east-1": "南美洲(圣保罗)"
     },
     "access": {
@@ -124,6 +129,7 @@
   },
   "error": {
     "InvalidAccessKeyId": "无效的Access Key ID",
+    "InvalidAKSK": "无效的Access Key ID或Secret Access Key",
     "SignatureDoesNotMatch": "签名不匹配，请确认登录信息的正确性",
     "InvalidExpiryTime": "链接有效期不能超过7天"
   },
